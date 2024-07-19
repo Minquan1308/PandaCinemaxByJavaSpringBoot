@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_new}">
+<head>
+    <title>Lịch sử đặt vé</title>
+    <link rel="stylesheet" href="/Font/css/OrderListIndex.css" />
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="ticket-list">
+        <div class="ticket-header">Lịch sử mua vé</div>
+        <div class="ticket-items">
+            <th:block th:each="item : ${orderHistory}">
+                <div class="ticket-item">
+                    <div class="cinema-info" th:data-orderid="${item.orderId}">
+                        <div class="cinema-name" th:text="${item.cinemaName}"></div>
+                        <div class="movie-title" th:text="${item.movieName}"></div>
+                        <div class="movie-title" th:text="${#dates.format(item.orderDate, 'dd/MM/yyyy')}"></div>
+                    </div>
+
+                </div>
+            </th:block>
+        </div>
+    </div>
+<!--    <div class="notification" id="paymentNotification">-->
+<!--        <span class="icon">&#10004;</span>-->
+<!--        <span id="notificationMessage"></span>-->
+<!--    </div>-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var cinemaInfos = document.querySelectorAll('.cinema-info');
+
+            cinemaInfos.forEach(function (cinemaInfo) {
+                cinemaInfo.addEventListener('click', function () {
+<!--                    var orderId = this.dataset.orderid;-->
+<!--                    window.location.href = /*[[@{/orderList/detail(orderId=${orderId})}]]*/ 'orderList/detail?orderId=' + orderId;-->
+<!--                    -->
+                        var orderId = this.dataset.orderid ; // Replace with actual movieId if needed
+                window.location.href = "/orderList/detail?orderId=" + orderId;
+
+                });
+            });
+
+            // Hiển thị thông báo nếu có Message từ TempData
+            var message = /*[[${notificationMessage}]]*/ '';
+            if (message) {
+                var notification = document.getElementById('paymentNotification');
+                var notificationMessage = document.getElementById('notificationMessage');
+                notificationMessage.textContent = message;
+                notification.classList.add('show');
+                setTimeout(function () {
+                    notification.classList.remove('show');
+                    notification.classList.add('hide');
+                    setTimeout(function () {
+                        notification.style.display = 'none';
+                        notification.classList.remove('hide'); // Đảm bảo lớp 'hide' bị loại bỏ khi ẩn hoàn toàn
+                    }, 500); // Thời gian cho animation zoomOut
+                }, 4000); // Ẩn sau 4 giây
+            }
+        });
+    </script>
+</section>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_new}">
+<head>
+    <title>Show Screening</title>
+    <style>
+        .screening-view-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .movie-title {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .date-picker, .cinema-picker {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .date-picker ul, .cinema-picker ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .date-picker li, .cinema-picker li {
+            display: inline-block;
+        }
+
+        .date-item a, .cinema-item a {
+            text-decoration: none;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            color: #000;
+            display: block;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .date-item.selected a, .cinema-item.selected a {
+            background-color: #d9534f;
+            color: #fff;
+        }
+
+        .date-item a:hover, .cinema-item a:hover {
+            background-color: #ddd;
+        }
+
+        .screenings-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .cinema-group {
+            margin-bottom: 20px;
+        }
+
+        .cinema-name {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .cinema-location {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .date-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .time-slot {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex: 1 1 calc(25% - 10px);
+            text-align: center;
+        }
+
+        .time-slot:hover {
+            background-color: #0056b3;
+        }
+
+        .no-screenings {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .date-item-button, .cinema-item-button {
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .date-item-button.selected, .cinema-item-button.selected {
+            background-color: #d9534f;
+            color: #fff;
+        }
+
+        .date-item-button:hover, .cinema-item-button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<p></p>
+<section layout:fragment="content" class="container mt-5">
+    <div class="screening-view-container">
+        <h1 class="movie-title" th:text="${movieName}"></h1>
+
+        <div class="cinema-picker">
+            <ul>
+                <li th:each="cinema : ${cinemas}"
+                    th:classappend="${cinema.id} == ${cinemaId} ? 'selected' : ''"
+                    class="cinema-item">
+                    <a th:href="@{/screenings/User/search(cinemaId=${cinema.id}, date=${selectedDate})}"
+                       class="cinema-item-button"
+                       th:class="${cinema.id} == ${cinemaId} ? 'selected' : ''">
+                        <span th:text="${cinema.cinemaName}"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="date-picker">
+            <ul>
+                <li th:each="dateMap : ${formattedDateList}"
+                    th:classappend="${dateMap.fullDate} == ${selectedDate} ? 'selected' : ''"
+                    class="date-item">
+                    <a th:href="@{/screenings/User/search(cinemaId=${cinemaId}, date=${dateMap.fullDate})}"
+                       class="date-item-button"
+                       th:class="${dateMap.fullDate} == ${selectedDate} ? 'selected' : ''">
+                        <span th:text="${dateMap.day} + ' ' + ${dateMap.weekDay}"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="screenings-container">
+            <div th:if="${screeningsByMovie.isEmpty()}" class="no-screenings">
+                <img src="/Font/images/error/notfound.png" style="height:30vh; text-align:center; margin-left:10%;" />
+                <p>Lịch chiếu hiện đang trống.</p>
+            </div>
+
+            <div th:each="entry : ${screeningsByMovie}" class="cinema-group">
+                <h3 th:text="${entry.key}" class="cinema-name"></h3>
+<!--                <img th:src="@{/images/{imageFile}(imageFile=${screening.movie.image})}" alt="Movie Image" class="movie-image">-->
+
+                <div class="date-group" th:each="screening : ${entry.value}">
+                    <form th:action="@{/seat/choose}" method="get" class="screening-form">
+                        <input type="hidden" name="roomId" th:value="${screening.room.id}" />
+                        <input type="hidden" name="screeningId" th:value="${screening.id}" />
+                        <input type="hidden" name="movieId" th:value="${screening.movie.id}" />
+                        <input type="hidden" name="timeSlot" th:value="${screening.time} + '-' + ${screening.endTime}" />
+                        <button type="submit" class="btn btn-primary time-slot"
+                                th:value="${screening.time}" th:text="${screening.time}+'-'+${screening.endTime}">
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

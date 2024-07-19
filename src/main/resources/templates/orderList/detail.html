@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_new}">
+<head>
+    <title>Thông tin vé xem phim</title>
+    <link rel="stylesheet" href="/Font/css/order.css" />
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="ticket-container">
+        <div class="header">
+            <h2 th:text="${cinemaName}"></h2>
+            <h3 th:text="${tenPhim}"></h3>
+            <img th:src="@{/images/{image}(image=${movie.image})}" th:alt="${movie.name}">
+        </div>
+        <div class="details">
+            <p><strong>Thời gian:</strong> <span th:text="${orderDate}"></span></p>
+            <p><strong>Số lượng:</strong> <span th:text="${soLuong}"></span></p>
+            <p><strong>Tổng tiền:</strong> <span th:text="${tongTien}"></span> VNĐ</p>
+            <p><strong>Phòng chiếu:</strong> <span th:text="${roomNumber}"></span></p>
+            <p><strong>Rạp chiếu:</strong> <span th:text="${cinemaName}"></span></p>
+            <p><strong>Số ghế:</strong> <span th:text="${seatNumbers}"></span></p>
+            <p><strong>Khung giờ:</strong> <span th:text="${timeSlot}"></span></p>
+        </div>
+    </div>
+    <div class="notification" id="paymentNotification" th:if="${notificationMessage != null}">
+        <span class="icon">&#10004;</span> <!-- Dấu tick màu xanh lá -->
+        <span id="notificationMessage" th:text="${notificationMessage}"></span>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var notification = document.getElementById('paymentNotification');
+            if (notification) {
+                notification.classList.add('show');
+                setTimeout(function () {
+                    notification.classList.remove('show');
+                    notification.classList.add('hide');
+                    setTimeout(function () {
+                        notification.style.display = 'none';
+                        notification.classList.remove('hide'); // Đảm bảo lớp 'hide' bị loại bỏ khi ẩn hoàn toàn
+                    }, 500); // Thời gian cho animation zoomOut
+                }, 4000); // Ẩn sau 4 giây
+            }
+        });
+    </script>
+</section>
+</body>
+</html>

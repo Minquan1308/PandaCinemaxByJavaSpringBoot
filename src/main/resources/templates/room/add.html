@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_admin}">
+<head>
+    <title>Form Thêm Room</title>
+
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <h1 class="mb-4">Form Room</h1>
+    <form id="addRoomForm" th:action="@{/rooms/add}" th:object="${room}" method="post">
+        <div class="form-group">
+            <label for="cinema" class="form-label">Cinema:</label>
+            <select th:field="*{cinema.id}" class="form-control" id="cinema" required>
+                <option th:each="cinema : ${cinemas}" th:value="${cinema.id}" th:text="${cinema.cinemaName}"></option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('cinema.id')}" th:errors="*{cinema.id}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="soHang">Number of Rows</label>
+            <input id="soHang" name="soHang" class="form-control" th:field="*{soHang}" />
+            <span th:if="${#fields.hasErrors('soHang')}" th:errors="*{soHang}" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="soCot">Number of Columns</label>
+            <input id="soCot" name="soCot" class="form-control" th:field="*{soCot}" />
+            <span th:if="${#fields.hasErrors('soCot')}" th:errors="*{soCot}" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a th:href="@{/rooms}" class="btn btn-info">Back</a>
+    </form>
+
+    <!-- Container to preview the seats -->
+    <div class="preview-container mt-4">
+        <h3 class="preview-title">Preview</h3>
+        <div id="roomPreview" class="seat-layout">
+            <!-- This is where the seat layout will be displayed automatically -->
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Lắng nghe sự kiện khi người dùng nhập số hàng
+    document.getElementById("soHang").addEventListener("input", function () {
+        console.log("Number of rows input detected");
+        createSeatLayout();
+    });
+
+    // Lắng nghe sự kiện khi người dùng nhập số cột
+    document.getElementById("soCot").addEventListener("input", function () {
+        console.log("Number of columns input detected");
+        createSeatLayout();
+    });
+
+    // Hàm để tạo layout của các ghế dựa trên số hàng và số cột đã nhập
+    function createSeatLayout() {
+        var soHang = parseInt(document.getElementById("soHang").value);
+        var soCot = parseInt(document.getElementById("soCot").value);
+
+        console.log("Rows: " + soHang + ", Columns: " + soCot);
+
+        var roomPreview = document.getElementById("roomPreview");
+        roomPreview.innerHTML = ""; // Xóa nội dung trước đó
+
+        if (isNaN(soHang) || isNaN(soCot)) {
+            return;
+        }
+
+        var seatLayout = document.createElement("div");
+        seatLayout.className = "seat-layout";
+
+        for (var i = 1; i <= soHang; i++) {
+            var seatRow = document.createElement("div");
+            seatRow.className = "seat-row";
+
+            for (var j = 1; j <= soCot; j++) {
+                var seatButton = document.createElement("button");
+                seatButton.className = "seat-button";
+                seatButton.textContent = String.fromCharCode(64 + i) + j; // Chuyển số thứ tự cột thành ký tự chữ cái và số
+                seatButton.setAttribute("type", "button"); // Ngăn chặn hành động mặc định khi click
+
+                seatRow.appendChild(seatButton);
+            }
+
+            seatLayout.appendChild(seatRow);
+        }
+
+        roomPreview.appendChild(seatLayout);
+    }
+</script>
+
+<style>
+    .room-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .seat-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .seat-row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .seat-button {
+        width: 50px;
+        height: 50px;
+        background-color: #fff;
+        border: 1px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .seat-button:hover {
+        background-color: pink;
+    }
+
+    .seat-text {
+        font-size: 16px;
+    }
+
+    .preview-container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin-top: 20px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .preview-title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+</style>
+
+</body>
+</html>

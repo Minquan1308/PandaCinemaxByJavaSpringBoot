@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_new}">
+<head>
+    <title>Register</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/Font/css/login.css}" />
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="ezy__signin6 light d-flex">
+        <div class="container">
+            <div class="row justify-content-between h-100">
+                <div class="col-lg-6">
+                    <div class="ezy__signin6-bg-holder d-none d-lg-block h-100"
+                         style="background-image: url(https://media.istockphoto.com/id/1062917958/vi/vec-to/hai-v%C3%A9-xem-phim-v%C3%A9-xem-phim-vector-v%C3%A9-xem-phim-ho%E1%BA%A1t-h%C3%AC...pUPouxI=)"></div>
+                </div>
+                <div class="col-lg-5 py-5 d-flex align-items-center">
+                    <div class="row align-items-center w-100">
+                        <div class="col-12">
+                            <div class="card ezy__signin6-form-card">
+                                <div class="card-body p-0">
+                                    <h2 class="ezy__signin6-heading mb-3">Đăng ký</h2>
+                                    <form th:action="@{/register}" method="post">
+                                        <div th:if="${errors}" class="alert alert-danger justify-content-center" role="alert">
+                                            <ul>
+                                                <li th:each="error : ${errors}" th:text="${error}" class="text-danger text-start"></li>
+                                            </ul>
+                                        </div>
+                                        <label for="username">UserName</label>
+                                        <div class="form-group mb-4">
+                                            <input type="text" class="form-control" id="username" name="username"
+                                                   placeholder="Enter your username" required>
+                                        </div>
+                                        <label for="email">Email</label>
+                                        <div class="form-group mb-4">
+                                            <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                                        </div>
+                                        <label for="password">Mật khẩu</label>
+                                        <div class="form-group mb-4">
+                                            <input type="password" class="form-control" id="password" name="password" placeholder="password" required>
+                                        </div>
+                                        <label for="confirmPassword">Xác nhận mật khẩu</label>
+                                        <div class="form-group mb-4">
+                                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="password" required>
+                                        </div>
+                                        <div class="button-container">
+                                            <button type="submit" class="btn ezy__signin6-btn-submit w-100">
+                                                Đăng ký
+                                                <i class="zmdi zmdi-arrow-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="position-relative ezy__signin6-or-separator">
+                                            <hr class="my-4 my-md-5" />
+                                            <span class="px-2">Or</span>
+                                        </div>
+                                    </form>
+                                    <div class="google-login-container">
+                                        <p>
+                                            <a href="" class="btn btn-danger ezy__signin6-btn w-100 d-flex align-items-center">
+                                                <span class="fab fa-google mr-2 text-white"></span>
+                                                <span class="text-center">Continue with Google</span>
+                                            </a>
+                                        </p>
+                                    </div>
+                                    <div class="text-center mt-4 mt-md-5">
+                                        <p class="mb-0 opacity-50 lh-1">Bạn đã có tài khoản?</p>
+                                        <a th:href="@{/login}" class="btn btn-link py-0 text-dark text-decoration-none">Đăng nhập</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${externalLogins?.size() > 0}">
+                            <section class="p-4 border rounded">
+                                <form th:action="@{/external-login}" method="post" class="form-horizontal">
+                                    <div class="google-login-container">
+                                        <p>
+                                            <button type="submit"
+                                                    class="btn btn-danger ezy__signin6-btn w-100 d-flex align-items-center"
+                                                    name="provider" value="Google"
+                                                    title="Log in using your Google account">
+                                                <span class="fab fa-google mr-2 text-white"></span>
+                                                <span class="text-center">Continue with Google</span>
+                                            </button>
+                                        </p>
+                                    </div>
+                                </form>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- components/search/default.html -->
+<style>
+    .rounded-image {
+        border-radius: 30%;
+        overflow: hidden;
+    }
+
+    .header-search .search-form {
+        width: 100%;
+    }
+
+    .input-group .input {
+        width: 75%;
+    }
+
+    .input-group .input-group-append {
+        width: 25%;
+    }
+
+    .header-ctn .dropdown a {
+        font-size: 18px;
+    }
+
+    .header-ctn .dropdown a i {
+        font-size: 24px;
+    }
+</style>
+
+<div id="header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="header-logo">
+                    <a href="#" class="logo">
+                        <img th:src="@{/User/img/Panda.png}" height="70px" width="140px" alt="" class="rounded-image">
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="header-search">
+                    <form th:action="@{/movies/search}" method="get" class="search-form">
+                        <div class="input-group">
+                            <select class="input-select" name="catid">
+                                <option value="0">Tất cả thể loại</option>
+                                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                            </select>
+                            <input class="input" name="keyword" placeholder="Tìm kiếm tại đây">
+                            <div class="input-group-append">
+                                <button type="submit" class="search-btn">Tìm kiếm</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-3 clearfix">
+                <div class="header-ctn">
+                    <div class="dropdown">
+                        <a class="dropdown-toggle" th:href="@{/orders}">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span>Lịch sử đặt vé</span>
+                        </a>
+                    </div>
+
+                    <div class="menu-toggle">
+                        <a href="#">
+                            <i class="fa fa-bars"></i>
+                            <span>Menu</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</html>

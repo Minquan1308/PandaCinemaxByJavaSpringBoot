@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_new}">
+<head>
+    <title>Show Screening</title>
+    <style>
+        .screening-view-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .movie-title {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .date-picker {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .date-picker ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .date-picker li {
+            display: inline-block;
+        }
+
+        .date-item a {
+            text-decoration: none;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            color: #000;
+            display: block;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .date-item.selected a {
+            background-color: #d9534f;
+            color: #fff;
+        }
+
+        .date-item a:hover {
+            background-color: #ddd;
+        }
+
+        .screenings-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .cinema-group {
+            margin-bottom: 20px;
+        }
+
+        .cinema-name {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .cinema-location {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .date-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .time-slot {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex: 1 1 calc(25% - 10px);
+            text-align: center;
+        }
+
+        .time-slot:hover {
+            background-color: #0056b3;
+        }
+
+        .no-screenings {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 18px;
+            color: #333;
+        }
+        .date-item-button {
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    color: #000;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+}
+
+.date-item-button.selected {
+    background-color: #d9534f;
+    color: #fff;
+}
+
+.date-item-button:hover {
+    background-color: #ddd;
+}
+
+    </style>
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="screening-view-container">
+        <h1 class="movie-title" th:text="${movieName}"></h1>
+
+        <div class="date-picker">
+            <ul>
+                <li th:each="dateMap : ${formattedDateList}"
+                    th:classappend="${dateMap.fullDate} == ${selectedDate} ? 'selected' : ''"
+                    class="date-item">
+                    <a th:href="@{/screenings/User/show(movieId=${movieId}, date=${dateMap.fullDate})}"
+                       class="date-item-button"
+                       th:class="${dateMap.fullDate} == ${selectedDate} ? 'selected' : ''">
+                        <span th:text="${dateMap.day} + ' ' + ${dateMap.weekDay}"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="screenings-container">
+        <div th:if="${screeningsByCinema.isEmpty()}" class="no-screenings">
+            <img src="/Font/images/error/notfound.png" style="height:30vh; text-align:center; margin-left:10%;" />
+            <p>Lịch chiếu hiện đang trống.</p>
+        </div>
+
+        <div th:each="entry : ${screeningsByCinema}" class="cinema-group">
+            <h3 th:text="${entry.key}" class="cinema-name"></h3>
+            <div th:each="locationEntry : ${entry.value}">
+                <h6 th:text="${locationEntry.key}" class="cinema-location"></h6>
+                <div th:if="${locationEntry.value.isEmpty()}" class="no-screenings">
+                    <img src="/Font/images/error/notfound.png" style="height:30vh; text-align:center; margin-left:10%;" />
+                    <p>Lịch chiếu hiện đang trống.</p>
+                </div>
+                <div class="date-group" th:unless="${locationEntry.value.isEmpty()}">
+                    <div th:each="screening : ${locationEntry.value}" class="screening-item">
+                        <form th:action="@{/seat/choose}" method="get" class="screening-form">
+                            <input type="hidden" name="roomId" th:value="${screening.room.id}" />
+                            <input type="hidden" name="screeningId" th:value="${screening.id}" />
+                            <input type="hidden" name="movieId" th:value="${movieId}" />
+                            <input type="hidden" name="timeSlot" th:value="${screening.time} + '-' + ${screening.endTime}" />
+                            <button type="submit" class="btn btn-primary time-slot"
+                                    th:value="${screening.time}" th:text="${screening.time}+'-'+${screening.endTime}">
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+
+        <script th:inline="javascript">
+            function filterByDate(selectedDate) {
+                var movieId = /*[[${movieId}]]*/ 'defaultMovieId'; // Replace with actual movieId if needed
+                window.location.href = "/screenings/User/show?movieId=" + movieId + "&date=" + selectedDate;
+            }
+
+            window.onload = function () {
+                var selectedDate = /*[[${selectedDate}]]*/ 'defaultDate'; // Replace with actual selected date if needed
+                if (selectedDate) {
+                    var selectedDateItem = document.querySelector('.date-item.selected');
+                    if (selectedDateItem) {
+                        selectedDateItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+        </script>
+    </div>
+</section>
+</body>
+</html>

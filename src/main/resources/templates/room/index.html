@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_admin}">
+<head>
+    <title th:text="${title} ?: 'Rooms List'"> Rooms List </title>
+
+</head>
+<body>
+<section layout:fragment="content">
+    <h1>Rooms List</h1>
+    <div>
+        <a th:href="@{/rooms/add}" class="btn btn-primary mb-3">Add New
+            Room</a>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>CinemaName</th>
+            <th>Total seats</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="room : ${rooms}">
+            <td th:text="${room.id}"></td>
+            <td th:text="${room.cinema.cinemaName}"></td>
+            <td th:text="${room.soHang * room.soCot}"></td>
+            <td>
+                <a th:href="@{/rooms/edit/{id}(id=${room.id})}" class="btn
+btn-success btn-sm">Edit</a>
+                <a th:href="@{/rooms/delete/{id}(id=${room.id})}"
+                   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

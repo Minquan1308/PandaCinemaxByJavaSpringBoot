@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security5"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_admin}">
+<head>
+    <title>Daily Revenue</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="container">
+        <div class="date-picker mb-4">
+            <form class="form-inline" th:action="@{/admin/dailyRevenue}" method="post">
+                <div class="form-group mb-2">
+                    <label for="dateSelector" class="mr-2">Select Date:</label>
+                    <select class="form-control" id="dateSelector" name="date">
+                        <option th:each="dateArray : ${dateList}"
+                                th:value="${dateArray[0]}"
+                                th:text="${dateArray[1]}"
+                                th:selected="${selectedDate == dateArray[0]}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="cinemaSelector" class="mr-2">Select Cinema:</label>
+                    <select class="form-control" id="cinemaSelector" name="location">
+                        <option th:each="cinema : ${cinemas}"
+                                th:value="${cinema}"
+                                th:text="${cinema}"
+                                th:selected="${selectedCinema == cinema}"></option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary mb-2">Submit</button>
+            </form>
+        </div>
+
+        <h2 class="text-center mt-5 mb-3">Daily Revenue</h2>
+
+        <div th:if="${not #lists.isEmpty(detailsWithMovieInfo)}">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">OrderId</th>
+                    <th scope="col">CustomerId</th>
+                    <th scope="col">OrderDate</th>
+                    <th scope="col">Movie</th>
+                    <th scope="col">TotalPrice</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${detailsWithMovieInfo}">
+                    <td th:text="${order.orderId}"></td>
+                    <td th:text="${order.userId}"></td>
+                    <td th:text="${#dates.format(order.orderDate, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${order.movieName}"></td>
+                    <td th:text="${order.price}"></td>
+                    <td><a th:href="@{/admin/details/{orderId}(orderId=${order.orderId.toString()})}" class="btn btn-info btn-sm">
+                        <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="summary-info">
+                <p>Revenue of the day: <span th:text="${total}"></span></p>
+                <p>Monthly Revenue Up To Selected Date: <span th:text="${monthlyRevenueUpToSelectedDate}"></span></p>
+                <p>Total Monthly Revenue: <span th:text="${totalMonthlyRevenue}"></span></p>
+            </div>
+        </div>
+
+        <div th:unless="${not #lists.isEmpty(detailsWithMovieInfo)}">
+            <p class="text-center">There are currently no orders for the day.</p>
+            <div class="summary-info">
+                <p>Revenue of the day: <span th:text="${total}"></span></p>
+                <p>Monthly Revenue Up To Selected Date: <span th:text="${monthlyRevenueUpToSelectedDate}"></span></p>
+                <p>Total Monthly Revenue: <span th:text="${totalMonthlyRevenue}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /* Thymeleaf script to set selected values on page load */
+        var dateSelector = document.getElementById("dateSelector");
+        var cinemaSelector = document.getElementById("cinemaSelector");
+
+        dateSelector.value = /*[[${selectedDate}]]*/ '';
+        cinemaSelector.value = /*[[${selectedCinema}]]*/ '';
+    </script>
+</section>
+
+</body>
+</html>

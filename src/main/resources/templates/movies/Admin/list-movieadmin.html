@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_admin}">
+<head>
+    <title th:text="${title} ?: 'Categories List'"> Movies List </title>
+</head>
+<body>
+<section layout:fragment="content">
+    <h1>Movies List</h1>
+    <div>
+        <a th:href="@{/movies/add}" class="btn btn-primary mb-3">Add New
+            Movie</a>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Image</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Duration (Minutes)</th>
+
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="movie : ${movies}">
+            <td th:text="${movie.name}">Movie Name</td>
+            <td th:text="${movie.startDate}">Start Date</td>
+            <td th:text="${movie.endDate}">End Date</td>
+            <td>
+                <!-- Hiển thị hình ảnh của phim -->
+                <img th:src="@{/images/{imageFile}(imageFile=${movie.image})}" class="img-fluid rounded" style="max-width: 100px;" />
+            </td>
+            <td th:text="${movie.price}">0.0</td>
+            <td th:text="${movie.description}">Description</td>
+            <td th:text="${movie.durationMinutes}">0</td>
+
+            <td>
+                <a th:href="@{/movies/Admin/{id}(id=${movie.id})}"><i class="fa fa-arrow-circle-right"></i></a>
+                <a th:href="@{/movies/edit/{id}(id=${movie.id})}"><i class="fa fa-edit"></i></a>
+                <a th:href="@{/movies/delete/{id}(id=${movie.id})}" onclick="return confirm('Are you sure?')"><i class="ti-trash"></i></a>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

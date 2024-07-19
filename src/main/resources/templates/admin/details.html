@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security5"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_admin}">
+<head>
+    <title>Revenue Detail</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .ticket-container {
+            max-width: 400px;
+            margin: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .header img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .details {
+            margin-bottom: 16px;
+        }
+
+        .details p {
+            margin: 4px 0;
+        }
+
+        .seat-list {
+            margin-bottom: 16px;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="ticket-container">
+        <div class="header">
+            <h2 th:text="${cinemaName}"></h2>
+            <h3 th:text="${tenPhim}"></h3>
+            <img th:src="@{/images/{image}(image=${movie.image})}" th:alt="${movie.name}">
+        </div>
+        <div class="details">
+            <p><strong>Thời gian:</strong> <span th:text="${orderDate}"></span></p>
+            <p><strong>Số lượng:</strong> <span th:text="${soLuong}"></span></p>
+            <p><strong>Tổng tiền:</strong> <span th:text="${tongTien}"></span> VNĐ</p>
+            <p><strong>Phòng chiếu:</strong> <span th:text="${roomNumber}"></span></p>
+            <p><strong>Rạp chiếu:</strong> <span th:text="${cinemaName}"></span></p>
+            <p><strong>Số ghế:</strong> <span th:text="${seatNumbers}"></span></p>
+        </div>
+    </div>
+
+    <div class="back-button">
+        <a th:href="@{/admin/dailyRevenue}" class="btn btn-primary">Quay lại</a>
+    </div>
+</section>
+
+</body>
+</html>

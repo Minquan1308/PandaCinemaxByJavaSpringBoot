@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_new}">
+<head>
+    <title>Show Screening</title>
+    <link rel="stylesheet" th:href="@{/Font/css/choose.css}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .seat.gray.disabled {
+            background-color: gray !important; /* Màu nền Xám */
+            color: #fff; /* Màu chữ trắng */
+            pointer-events: none; /* Ngăn không cho người dùng tương tác */
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="container">
+        <div class="row">
+            <h2 class="title text-center">Chọn ghế</h2>
+
+            <!-- Thông tin thêm, ẩn mặc định -->
+            <div class="movie-info">
+                <p class="info room-info">Phòng <span th:text="${roomId}"></span></p>
+                <p class="info">Phim: <span th:text="${movieName}"></span></p>
+                <p class="info">Khung giờ: <span th:text="${timeSlot}"></span></p>
+                <div class="info" id="ticketPrice">Giá vé: <span th:text="${ticketPrice}"></span> VND</div>
+            </div>
+
+            <div class="screen-divider">
+                <hr class="divider-line">
+                <div class="screen-text">Màn hình</div>
+            </div>
+
+<!--            <div class="seat-layout">-->
+<!--                <div th:each="rowIndex : ${#numbers.sequence(0, row - 1)}" class="seat-row">-->
+<!--                    <div th:each="colIndex : ${#numbers.sequence(0, number - 1)}" class="seat-column">-->
+<!--                        <th>-->
+<!--                            <div th:with="seatIndex=${rowIndex * number + colIndex}">-->
+<!--                                <button type="button" class="seat"-->
+<!--                                        th:if="${seatIndex lt seats.size()}"-->
+<!--                                        th:classappend="${seats[seatIndex].isAvailable ? 'white' : 'gray'}"-->
+<!--                                        th:attr="data-seat-id=${seats[seatIndex].id}, data-seat-code=${seats[seatIndex].seatCode}">-->
+<!--                                    <span class="seat-text" th:text="${seats[seatIndex].seatCode}"></span>-->
+<!--                                </button>-->
+<!--                            </div>-->
+<!--                        </th>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="seat-layout">
+                <div th:each="rowIndex : ${#numbers.sequence(0, row - 1)}" class="seat-row">
+                    <div th:each="colIndex : ${#numbers.sequence(0, number - 1)}" class="seat-column">
+                        <th>
+                            <div th:with="seatIndex=${rowIndex * number + colIndex}">
+                                <button type="button" class="seat"
+                                        th:if="${seatIndex lt seats.size()}"
+                                        th:classappend="${seats[seatIndex].isAvailable ? '' : 'gray disabled'}"
+                                        th:attr="data-seat-id=${seats[seatIndex].id}, data-seat-code=${seats[seatIndex].seatCode}">
+                                    <span class="seat-text" th:text="${seats[seatIndex].seatCode}"></span>
+                                </button>
+                            </div>
+                        </th>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="legend" style="margin-bottom: 20px;">
+                <div class="legend-item">
+                    <div class="seat-legend pink"></div>
+                    <span>Ghế đã chọn</span>
+                </div>
+                <div class="legend-item">
+                    <div class="seat-legend white"></div>
+                    <span>Ghế trống</span>
+                </div>
+                <div class="legend-item">
+                    <div class="seat-legend gray"></div>
+                    <span>Ghế đã được đặt</span>
+                </div>
+            </div>
+
+            <div id="selectedSeats" class="info">Số ghế đã chọn:</div> <!-- Phần tử để hiển thị số ghế đã chọn -->
+
+            <form th:action="@{/seat/bookTicket}" method="post">
+                <input type="hidden" name="roomId" th:value="${roomId}" />
+                <input type="hidden" name="screeningId" th:value="${screeningId}" />
+                <input type="hidden" name="timeSlot" th:value="${timeSlot}" />
+                <input type="hidden" name="movieId" th:value="${movieId}" />
+                <input type="hidden" id="selectedSeatIdsInput" name="selectedSeatIds" />
+                <button type="submit" class="btn btn-primary btn-purchase">Mua vé</button>
+            </form>
+
+            <div id="totalPrice" class="info">Tổng tiền: 0 VND</div>
+            <a th:href="@{/seatBookingCart/clearCart(movieId=${movieId})}" class="btn btn-secondary btn-back">Trở về</a>
+
+            <script>
+                $(document).ready(function () {
+                    $('.seat').click(function (event) {
+                        var isAvailable = !$(this).hasClass('gray');
+                        var seatId = $(this).data('seat-id');
+
+                        if (isAvailable) {
+                            $(this).toggleClass('selected');
+                            if ($(this).hasClass('selected')) {
+                                addToCart(seatId);
+                            } else {
+                                removeFromCart(seatId);
+                            }
+                        }
+                        event.preventDefault();
+                        updateTotalPrice();
+                        updateSelectedSeats();
+                    });
+
+                    function addToCart(seatId) {
+                        console.log("Adding seat to cart:", seatId);
+                        // Gửi AJAX request để thêm ghế vào giỏ hàng
+                        $.ajax({
+                            type: 'GET',
+                            url: '/seatBookingCart/addToCart',
+                            data: { seatId: seatId },
+                            success: function (data) {
+                                console.log("Seat added successfully:", data);
+                            },
+                            error: function (xhr, status, error) {
+                                console.log("Error adding seat to cart:", status, error);
+                            }
+                        });
+                    }
+
+                    function removeFromCart(seatId) {
+                        console.log("Removing seat from cart:", seatId);
+                        // Gửi AJAX request để xóa ghế khỏi giỏ hàng
+                        $.ajax({
+                            type: 'GET',
+                            url: '/seatBookingCart/removeFromCart',
+                            data: { seatId: seatId },
+                            success: function (data) {
+                                console.log("Seat removed successfully:", data);
+                            },
+                            error: function (xhr, status, error) {
+                                console.log("Error removing seat from cart:", status, error);
+                            }
+                        });
+                    }
+
+                    function updateTotalPrice() {
+                        var selectedSeatCount = $('.seat.selected').length;
+                        var ticketPrice = parseFloat($('#ticketPrice span').text());
+                        var totalPrice = selectedSeatCount * ticketPrice;
+                        $('#totalPrice').text('Tổng tiền: ' + totalPrice.toLocaleString('vi-VN') + ' VND');
+                    }
+
+                    function updateSelectedSeats() {
+                        var selectedSeats = [];
+                        $('.seat.selected').each(function () {
+                            var seatText = $(this).find('.seat-text').text();
+                            selectedSeats.push(seatText);
+                        });
+                        $('#selectedSeats').text('Số ghế đã chọn: ' + selectedSeats.join(', '));
+
+                        // Cập nhật giá trị cho input hidden selectedSeatIds
+                        var selectedSeatIds = $('.seat.selected').map(function () {
+                            return $(this).data('seat-id');
+                        }).get();
+                        $('#selectedSeatIdsInput').val(selectedSeatIds.join(','));
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</section>
+</body>
+</html>

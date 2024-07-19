@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_admin}">
+<head>
+    <title>Form Update Screening</title>
+
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <h1 class="mb-4">Form Update Screening</h1>
+    <form th:action="@{/screenings/update/{id}(id=${screening.id})}" th:object="${screening}" method="post">
+        <!-- Select Movies -->
+        <div class="form-group mb-3">
+            <label for="movies">Movies:</label>
+            <select id="movies" name="movie" class="form-control" required>
+                <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.name}"
+                        th:data-duration="${movie.durationMinutes}"></option>
+            </select>
+        </div>
+
+        <!-- Select Cinemas -->
+        <div class="form-group mb-3">
+            <label for="cinemas">Cinemas:</label>
+            <select id="cinemas" name="cinema" class="form-control" required>
+                <option th:each="cinema : ${cinemas}" th:value="${cinema.id}" th:text="${cinema.cinemaName}"></option>
+            </select>
+        </div>
+
+
+        <!-- Select Rooms -->
+        <div class="form-group mb-3">
+            <label for="rooms">Room:</label>
+            <select id="rooms" name="room.id" class="form-control" required>
+                <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.id}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="date" class="form-label">Date:</label>
+            <input type="date" th:field="*{date}" class="form-control" id="date" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
+        </div>
+        <!-- Start Time -->
+        <div class="mb-3">
+            <label for="time" class="form-label">Start Time:</label>
+            <input type="text" th:field="*{time}" class="form-control" id="time" placeholder="HH:mm" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('time')}" th:errors="*{time}"></div>
+        </div>
+
+
+
+        <!-- End Time -->
+        <!--    <div class="mb-3">-->
+        <!--      <label for="endTime" class="form-label">End Time:</label>-->
+        <!--      <input type="text" th:field="*{endTime}" class="form-control" id="endTime" placeholder="HH:mm" readonly>-->
+        <!--      <div class="text-danger" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>-->
+        <!--    </div>-->
+
+        <!-- Submit and Back Buttons -->
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a th:href="@{/screenings}" class="btn btn-info ms-2">Back</a>
+        </div>
+    </form>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    $(document).ready(function() {
+    $('#cinemas').change(function() {
+      var cinemaId = $(this).val();
+      $.ajax({
+        type: 'GET',
+        url: '/screenings/cinemas/' + cinemaId + '/rooms',
+        success: function(data) {
+          var options = '<option value="">Choose Room</option>';
+          for (var i = 0; i < data.length; i++) {
+            options += '<option value="' + data[i].id + '">' + data[i].name + '</option>';
+          }
+          $('#rooms').html(options);  // Populate rooms dropdown
+        },
+        error: function() {
+          console.log('Error loading rooms.');
+        }
+      });
+    });
+
+    // Trigger change event on cinemas dropdown on page load (if pre-selected)
+    $('#cinemas').trigger('change');
+  });
+
+   });
+        $(document).ready(function() {
+       $('#time').on('input', function() {
+         var startTime = $(this).val();
+         var movieDuration = $('#movies option:selected').data('duration');
+         if (startTime && movieDuration) {
+           var startTimeParts = startTime.split(':');
+           var startHour = parseInt(startTimeParts[0]);
+           var startMinute = parseInt(startTimeParts[1]);
+
+           var endMinute = startMinute + movieDuration;
+           var endHour = startHour + Math.floor(endMinute / 60);
+           endMinute = endMinute % 60;
+
+           var endTime = (endHour < 10 ? '0' : '') + endHour + ':' + (endMinute < 10 ? '0' : '') + endMinute;
+           $('#endTime').val(endTime);
+         }
+       });
+
+       $('#movies').change(function() {
+         $('#time').trigger('input');
+       });
+     });
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout_admin}">
+<head>
+    <title th:text="${title} ?: 'Screenings List'"> Screening List </title>
+
+</head>
+<body>
+<section layout:fragment="content">
+    <h1>Screening List</h1>
+    <div>
+        <a th:href="@{/screenings/add}" class="btn btn-primary mb-3">Add New
+            Screening</a>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>MovieName</th>
+            <th>Cinema</th>
+            <th>Room</th>
+            <th>Date</th>
+            <th>StartTime</th>
+            <th>EndTime</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="screening : ${screenings}">
+            <td th:text="${screening.id}"></td>
+            <td th:text="${screening.movie.name}"></td>
+            <td th:text="${screening.cinema.cinemaName}"></td>
+            <td th:text="${screening.room.id}"></td>
+            <td th:text="${screening.date}"></td>
+            <td th:text="${screening.time}"></td>
+            <td th:text="${screening.endTime}"></td>
+
+            <td>
+                <a th:href="@{/screenings/edit/{id}(id=${screening.id})}" class="btn
+btn-success btn-sm">Edit</a>
+                <a th:href="@{/screenings/delete/{id}(id=${screening.id})}"
+                   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>
